@@ -20,7 +20,7 @@
       homeConfigurations = {
         myprofile = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          modules = [ ./home.nix ];
+          modules = [ ./home/default.nix ];
         };
       };
     };
