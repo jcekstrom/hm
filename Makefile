@@ -2,7 +2,7 @@
 
 .PHONY: update
 update:
-	home-manager switch -b old --flake .#myprofile
+	home-manager switch -b old --show-trace --flake .#myprofile
 
 clean:
 	nix-collect-garbage -d
