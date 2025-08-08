@@ -58,6 +58,7 @@
     pkgs.tmux
     pkgs.w3m
     pkgs.wget
+		inputs.ghostty.packages.${system}.default
     inputs.nixvim-config.packages.${system}.default
   ];
 
@@ -117,7 +118,7 @@ bw_unlock () {
     tmux set-environment -g BW_SESSION $BW_SESSION
   fi
 }
-j
+
 function prompt_command() {
   if [[ -n "''${TMUX}" ]]; then
     eval "$(tmux show-environment -s)"

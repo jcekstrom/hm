@@ -21,6 +21,10 @@
       url = "github:pete3n/nixvim-flake/nixos-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+		
+		ghostty = {
+			url = "github:ghostty-org/ghostty";
+		};
   };
 
   outputs = inputs@{ nixpkgs, nixpkgs-unstable, home-manager, nixvim-config, ... }:
@@ -48,6 +52,25 @@
       		pkgs = import nixpkgs { inherit system; };
 					userinfo = {
 						username = "jce";
+						homedir = "/home/jce";
+					};
+        in home-manager.lib.homeManagerConfiguration {
+					inherit pkgs;
+          # Specify your home configuration modules here, for example,
+          # the path to your home.nix.
+          modules = [
+            ./home
+          ];
+          extraSpecialArgs = {
+          # Pass inputs to your home-manager module
+            inherit inputs system userinfo nixvim-config;
+          };
+      };
+        "ssm-user" = let
+      		system = "x86_64-linux";
+      		pkgs = import nixpkgs { inherit system; };
+					userinfo = {
+						username = "ssm-user";
 						homedir = "/home/jce";
 					};
         in home-manager.lib.homeManagerConfiguration {
