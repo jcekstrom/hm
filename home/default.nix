@@ -58,7 +58,7 @@
     pkgs.tmux
     pkgs.w3m
     pkgs.wget
-		inputs.ghostty.packages.${system}.default
+		#inputs.ghostty.packages.${system}.default
     inputs.nixvim-config.packages.${system}.default
   ];
 
