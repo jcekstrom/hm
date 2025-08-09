@@ -71,7 +71,7 @@
       		pkgs = import nixpkgs { inherit system; };
 					userinfo = {
 						username = "ssm-user";
-						homedir = "/home/jce";
+						homedir = "/home/ssm-user";
 					};
         in home-manager.lib.homeManagerConfiguration {
 					inherit pkgs;
