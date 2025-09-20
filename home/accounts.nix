@@ -3,6 +3,7 @@
     calendar = {
     };
     email = {
+			maildirBasePath = ".mail";
       accounts = {
         ekstrom = {
           address = "joey@ekstrom.org";
@@ -14,10 +15,10 @@
           aerc = {
             enable = true;
             extraAccounts = {
-              #source = "maildir://~/Maildir/ekstrom";
+              #source = "maildir://~/.mail/ekstrom";
               #check-mail-cmd = "mbsync ekstrom";
-              source = "notmuch://~/Maildir/";
-              maildir-store = "~/Maildir";
+              source = "notmuch://~/.mail/";
+              maildir-store = "~/.mail";
               maildir-account-path = "ekstrom";
               check-mail-cmd = "mbsync ekstrom && notmuch new";
               check-mail-timeout = "90s";
@@ -27,6 +28,7 @@
           mbsync = {
             enable = true;
             create = "maildir";
+						remove = "both";
           };
           msmtp.enable = true;
           neomutt = {
@@ -47,6 +49,35 @@
           };
           userName = "joey@ekstrom.org";
         };
+        gmail = {
+          address = "jcekstrom@gmail.com";
+          aerc = {
+            enable = true;
+            extraAccounts = {
+              source = "notmuch://~/.mail/";
+              maildir-store = "~/.mail";
+              maildir-account-path = "gmail";
+              check-mail-cmd = "gmi sync --path ~/.mail/gmail/";
+              check-mail-timeout = "90s";
+              check-mail = "5m";
+            };
+          };
+					flavor = "gmail.com";
+					lieer = {
+						enable = true;
+						sync.enable = true;
+					};
+          notmuch.enable = true;
+          realName = "Joey Ekstrom";
+          signature = {
+            text = ''
+              -Joey
+            '';
+            showSignature = "append";
+          };
+					#passwordCommand = "bw get password af0b0524-c372-424b-b7f3-b0b800fc5174";
+          userName = "jcekstrom@gmail.com";
+        };
         ekstech = {
           address = "joey@ekstech.net";
           #gpg = {
@@ -57,10 +88,10 @@
           aerc = {
             enable = true;
             extraAccounts = {
-              #source = "maildir://~/Maildir/ekstech";
+              #source = "maildir://~/.mail/ekstech";
               #check-mail-cmd = "mbsync ekstech";
-              source = "notmuch://~/Maildir/";
-              maildir-store = "~/Maildir";
+              source = "notmuch://~/.mail/";
+              maildir-store = "~/.mail";
               maildir-account-path = "ekstech";
               check-mail-cmd = "mbsync ekstech && notmuch new";
               check-mail-timeout = "90s";
@@ -70,6 +101,7 @@
           mbsync = {
             enable = true;
             create = "maildir";
+						remove = "both";
           };
           msmtp.enable = true;
           neomutt = {
@@ -99,10 +131,10 @@
           aerc = {
             enable = true;
             extraAccounts = {
-              #source = "maildir://~/Maildir/rcmtb";
+              #source = "maildir://~/.mail/rcmtb";
               #check-mail-cmd = "mbsync rcmtb";
-              source = "notmuch://~/Maildir/";
-              maildir-store = "~/Maildir";
+              source = "notmuch://~/.mail/";
+              maildir-store = "~/.mail";
               maildir-account-path = "rcmtb";
               check-mail-cmd = "mbsync rcmtb && notmuch new";
               check-mail-timeout = "90s";
@@ -112,6 +144,7 @@
           mbsync = {
             enable = true;
             create = "maildir";
+						remove = "both";
           };
           msmtp.enable = true;
           neomutt = {
@@ -141,10 +174,10 @@
           aerc = {
             enable = true;
             extraAccounts = {
-              #source = "maildir://~/Maildir/sablerock";
+              #source = "maildir://~/.mail/sablerock";
               #check-mail-cmd = "mbsync sablerock";
-              source = "notmuch://~/Maildir";
-              maildir-store = "~/Maildir";
+              source = "notmuch://~/.mail";
+              maildir-store = "~/.mail";
               maildir-account-path = "sablerock";
               check-mail-cmd = "mbsync sablerock && notmuch new";
               check-mail-timeout = "90s";
@@ -154,6 +187,7 @@
           mbsync = {
             enable = true;
             create = "maildir";
+						remove = "both";
           };
           msmtp.enable = true;
           neomutt = {

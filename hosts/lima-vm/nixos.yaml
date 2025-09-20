@@ -1,0 +1,49 @@
+# Lima template for the jce NixOS dev VM
+#
+# Build the image first:
+#   make build-lima          (or: nix build .#lima-vm-img --out-link result/nixos.qcow2)
+#
+# Then start the VM:
+#   make start-lima          (or: limactl start hosts/lima-vm/nixos.yaml --name nixos)
+#
+# Open a shell:
+#   make shell-lima          (or: limactl shell nixos)
+#
+# Rebuild NixOS inside the VM:
+#   make rebuild-lima        (or: limactl shell nixos -- sudo nixos-rebuild switch --flake .#lima-vm)
+
+images:
+  - location: "../../result/nixos.qcow2"
+    arch: "x86_64"
+
+vmType: "qemu"
+
+# The username must match users.users.<name> declared in the NixOS config.
+# lima-init will inject SSH keys and add this user to wheel at first boot.
+user: "jce"
+
+mounts:
+  - location: "~"
+    writable: false
+    9p:
+      # "mmap" is more stable than the default "fscache" on NixOS
+      cache: "mmap"
+  - location: "/tmp/lima"
+    writable: true
+    9p:
+      cache: "mmap"
+
+memory: "8GiB"
+
+portForwards:
+  # NixOS-specific: prevent Lima from intercepting host DHCP packets on UDP/68.
+  # Without this, DHCP on the host can be disrupted.
+  # See: https://github.com/nixos-lima/nixos-lima/issues/50
+  - proto: udp
+    guestPort: 68
+    guestIP: "0.0.0.0"
+    ignore: true
+
+containerd:
+  system: false
+  user: false

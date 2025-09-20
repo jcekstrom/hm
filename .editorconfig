@@ -1,0 +1,37 @@
+# EditorConfig helps maintain consistent coding styles for multiple developers
+# working on the same project across various editors and IDEs.
+# editorconfig.org
+
+# This is the top-most .editorconfig file
+root = true
+
+# Apply to all files
+[*]
+# Use spaces instead of tabs
+indent_style = space
+
+# Set indentation width to 4 spaces
+indent_size = 4
+
+# Use Unix-style newlines, with a newline at the end of all files
+end_of_line = lf
+insert_final_newline = true
+
+# Set the character set to utf-8
+charset = utf-8
+
+# Remove any whitespace characters preceding newline characters
+trim_trailing_whitespace = true
+
+# Set a max line length of 120 characters
+max_line_length = 120
+
+# You can also add settings for specific file types
+[*.md]
+trim_trailing_whitespace = false
+
+# Nix
+[*.nix]
+indent_style = space
+indent_size = 2
+max_line_length = 120
