@@ -8,6 +8,16 @@
 
   networking.hostName = "RESML-CT2334DN6X";
 
+  # linux-builder — lightweight aarch64-linux VM used by Nix to build Linux
+  # derivations natively on Apple Silicon (no cross-compilation overhead).
+  # Required for: nix build .#packages.aarch64-linux.lima-vm-img
+  # After enabling, run: darwin-rebuild switch, then the builder starts automatically.
+  nix.linux-builder = {
+    enable = true;
+    ephemeral = true;   # fresh VM state on each darwin-rebuild switch
+    maxJobs = 4;
+  };
+
   # Homebrew — placeholder for GUI/cask apps that aren't in nixpkgs for darwin
   homebrew = {
     enable = true;

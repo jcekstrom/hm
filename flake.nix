@@ -106,7 +106,7 @@
           ];
         };
 
-        # lima/colima development VM — full jce profile in a NixOS VM
+        # lima/colima development VM — full jce profile in a NixOS VM (x86_64)
         lima-vm = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit inputs; };
@@ -116,6 +116,27 @@
             {
               home-manager.extraSpecialArgs =
                 (hmSpecialArgs "x86_64-linux")
+                // {
+                  userinfo = {
+                    username = "jce";
+                    homedir = "/home/jce";
+                  };
+                };
+            }
+          ];
+        };
+
+        # lima/colima development VM — full jce profile in a NixOS VM (aarch64)
+        # Built on Apple Silicon Mac via nix.linux-builder; use make build-lima-aarch64
+        lima-vm-aarch64 = nixpkgs.lib.nixosSystem {
+          system = "aarch64-linux";
+          specialArgs = { inherit inputs; };
+          modules = [
+            { nixpkgs.config.allowUnfree = true; }
+            ./hosts/lima-vm/default.nix
+            {
+              home-manager.extraSpecialArgs =
+                (hmSpecialArgs "aarch64-linux")
                 // {
                   userinfo = {
                     username = "jce";
@@ -194,16 +215,16 @@
       };
 
       # ------------------------------------------------------------------ #
-      # Package outputs
+      # Package outputs — Lima VM qcow2 images
+      # Build x86_64 on ora:   make build-lima-x86_64
+      # Build aarch64 on Mac:  make build-lima-aarch64
       # ------------------------------------------------------------------ #
-      packages.x86_64-linux.lima-vm-img = nixos-generators.nixosGenerate {
-        pkgs = import nixpkgs { system = "x86_64-linux"; config.allowUnfree = true; };
-        specialArgs = { inherit inputs; };
-        modules = [
+      packages = let
+        limaVmModules = system: [
           ./hosts/lima-vm/default.nix
           {
             home-manager.extraSpecialArgs =
-              (hmSpecialArgs "x86_64-linux")
+              (hmSpecialArgs system)
               // {
                 userinfo = {
                   username = "jce";
@@ -212,7 +233,20 @@
               };
           }
         ];
-        format = "qcow-efi";
+      in {
+        x86_64-linux.lima-vm-img = nixos-generators.nixosGenerate {
+          pkgs = import nixpkgs { system = "x86_64-linux"; config.allowUnfree = true; };
+          specialArgs = { inherit inputs; };
+          modules = limaVmModules "x86_64-linux";
+          format = "qcow-efi";
+        };
+
+        aarch64-linux.lima-vm-img = nixos-generators.nixosGenerate {
+          pkgs = import nixpkgs { system = "aarch64-linux"; config.allowUnfree = true; };
+          specialArgs = { inherit inputs; };
+          modules = limaVmModules "aarch64-linux";
+          format = "qcow-efi";
+        };
       };
     };
 }

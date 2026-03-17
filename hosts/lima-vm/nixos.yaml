@@ -1,19 +1,25 @@
 # Lima template for the jce NixOS dev VM
+# Supports both x86_64 (built on ora) and aarch64 (built on Mac).
+# Lima picks the correct image automatically based on the host machine's arch.
 #
-# Build the image first:
-#   make build-lima          (or: nix build .#lima-vm-img --out-link result/nixos.qcow2)
+# Build images:
+#   make build-lima-x86_64     (run on ora)
+#   make build-lima-aarch64    (run on Mac)
 #
-# Then start the VM:
-#   make start-lima          (or: limactl start hosts/lima-vm/nixos.yaml --name nixos)
+# Start the VM:
+#   make start-lima            (or: limactl start hosts/lima-vm/nixos.yaml --name nixos)
 #
 # Open a shell:
-#   make shell-lima          (or: limactl shell nixos)
+#   make shell-lima
 #
 # Rebuild NixOS inside the VM:
-#   make rebuild-lima        (or: limactl shell nixos -- sudo nixos-rebuild switch --flake .#lima-vm)
+#   make rebuild-lima-x86_64   (if running x86_64 VM)
+#   make rebuild-lima-aarch64  (if running aarch64 VM)
 
 images:
-  - location: "../../result/nixos.qcow2"
+  - location: "../../result/nixos-aarch64.qcow2"
+    arch: "aarch64"
+  - location: "../../result/nixos-x86_64.qcow2"
     arch: "x86_64"
 
 vmType: "qemu"
