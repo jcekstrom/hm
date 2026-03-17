@@ -17,6 +17,48 @@
     useOSProber = true;
     memtest86.enable = true;
     default = "saved";
+    # Busybox recovery entries — all use the initrd's built-in busybox ash shell.
+    # No extra packages needed; busybox is always present in the NixOS initrd.
+    extraEntries = ''
+      submenu "Recovery (busybox initrd shell)" {
+        # Shell on fail: boots normally but drops to busybox if anything fails
+        menuentry "NixOS — shell on boot failure" {
+          search --set=drive1 --fs-uuid 41f42a72-13ec-4eed-8ccf-abb88953094a
+          linux ($drive1)/nix/var/nix/profiles/system/kernel \
+            init=/nix/var/nix/profiles/system/init \
+            boot.shell_on_fail \
+            $kernelparams
+          initrd ($drive1)/nix/var/nix/profiles/system/initrd
+        }
+        # Immediate shell: drops to busybox at the very start of stage 1
+        menuentry "NixOS — debug shell (immediate, stage 1)" {
+          search --set=drive1 --fs-uuid 41f42a72-13ec-4eed-8ccf-abb88953094a
+          linux ($drive1)/nix/var/nix/profiles/system/kernel \
+            init=/nix/var/nix/profiles/system/init \
+            boot.debug1 \
+            $kernelparams
+          initrd ($drive1)/nix/var/nix/profiles/system/initrd
+        }
+        # Shell after devices: useful for diagnosing disk/crypto/module issues
+        menuentry "NixOS — debug shell (after devices)" {
+          search --set=drive1 --fs-uuid 41f42a72-13ec-4eed-8ccf-abb88953094a
+          linux ($drive1)/nix/var/nix/profiles/system/kernel \
+            init=/nix/var/nix/profiles/system/init \
+            boot.debug1devices \
+            $kernelparams
+          initrd ($drive1)/nix/var/nix/profiles/system/initrd
+        }
+        # Shell after mounts: filesystem is mounted, good for fsck/data recovery
+        menuentry "NixOS — debug shell (after mounts)" {
+          search --set=drive1 --fs-uuid 41f42a72-13ec-4eed-8ccf-abb88953094a
+          linux ($drive1)/nix/var/nix/profiles/system/kernel \
+            init=/nix/var/nix/profiles/system/init \
+            boot.debug1mounts \
+            $kernelparams
+          initrd ($drive1)/nix/var/nix/profiles/system/initrd
+        }
+      }
+    '';
   };
   boot.loader.efi.canTouchEfiVariables = true;
 
@@ -28,15 +70,8 @@
     };
   };
 
-  # Display manager: ly (shows both Plasma and Hyprland sessions)
+  # Display manager: greetd with tuigreet (configured in modules/nixos/desktops/omarchy.nix)
   services.displayManager.sddm.enable = false;
-  services.displayManager.ly = {
-    enable = true;
-    settings = {
-      load = true;
-      save = true;
-    };
-  };
 
   # X11 keymap (used by some Wayland compositors for fallback)
   services.xserver.xkb = {
@@ -87,8 +122,10 @@
   ];
 
   xdg.portal = {
-    xdgOpenUsePortal = true;
     enable = true;
+    xdgOpenUsePortal = true;
+    # KDE Plasma 6 provides portal backends directly
+    # These are automatically available when Plasma is enabled above
   };
 
   users.users.jce = {
@@ -122,6 +159,7 @@
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   environment.systemPackages = with pkgs; [
+    less  # ensure GNU less takes priority over busybox less in root nix profile
     bitwarden-desktop
     bitwarden-cli
     cifs-utils
@@ -143,6 +181,14 @@
     networkmanager-l2tp
     strongswan
     xl2tpd
+  ];
+
+  fonts.packages = with pkgs; [
+    noto-fonts
+    noto-fonts-color-emoji
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.caskaydia-mono
+    maple-mono.NF
   ];
 
   services.openssh.enable = true;

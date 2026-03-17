@@ -14,7 +14,7 @@ switch-mac:
 
 # Standalone home-manager: primary Linux user
 switch-hm:
-	home-manager switch -b old --flake .#jce
+	nix run github:nix-community/home-manager/release-25.11 -- switch -b old --flake .#jce
 
 # Standalone home-manager: AWS SSM user
 switch-ssm:

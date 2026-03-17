@@ -1,7 +1,10 @@
 { inputs, userinfo, pkgs, system, unstable, ... }:
 {
+  nixpkgs.config.allowUnfree = true;
+
   imports = [
 	  ./accounts.nix
+    ./ssh.nix
   ];
 
 	home = {
@@ -35,8 +38,10 @@
 			#   echo "Hello, ${config.username}!"
 			# '')
 			pkgs.awscli2
+			pkgs.maple-mono.NF
 			#pkgs.bitwarden-cli
 			pkgs.curl
+			pkgs.deskflow
 			pkgs.fq
 			pkgs.gitprompt-rs
 			pkgs.gnumake
@@ -44,6 +49,7 @@
 			pkgs.jira-cli-go
 			pkgs.joplin
 			unstable.jujutsu
+			unstable.opencode
 			pkgs.pandoc
 			pkgs.pstree
 			pkgs.python314
@@ -56,7 +62,6 @@
 			pkgs.tmux
 			pkgs.w3m
 			pkgs.wget
-      #inputs.ghostty.packages.${system}.default
 			inputs.nixvim-config.packages.${system}.default
       pkgs.claude-code
 		];
@@ -81,6 +86,57 @@
           prefix=${userinfo.homedir}/.cache/npm/global
         '';
       };
+      ".config/ghostty/custom.css" = {
+        text = ''
+          headerbar {
+            height: 8px;
+            padding: 0;
+            margin: 0;
+          }
+
+          headerbar button {
+            margin: 0;
+            border: 1px solid black;
+          }
+
+          headerbar button image {
+            padding: 0;
+            margin: 0;
+          }
+
+          tabbox {
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+          }
+
+          tabbox tab {
+            margin: 0;
+            padding: 0;
+          }
+
+          tabbox tab label {
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
+          }
+
+          tab {
+            max-width: 140px;
+          }
+
+          notebook > header.top {
+            margin-left: 0;
+            margin-right: auto;
+            justify-content: flex-start;
+          }
+
+          notebook > header.top > tabs > tab {
+            max-width: 150px;
+            min-width: 50px;
+          }
+        '';
+      };
     };
 
 		# Home Manager can also manage your environment variables through
@@ -101,6 +157,7 @@
 		#
 		sessionVariables = {
 			EDITOR = "nvim";
+			SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/rbw/ssh-agent-socket";
 		};
 
 		sessionPath = [
@@ -114,6 +171,50 @@
   # Let Home Manager install and manage itself.
 	programs = {
 		home-manager.enable = true;
+
+    ghostty = {
+      enable = true;
+      enableBashIntegration = true;
+      installBatSyntax = true;
+      settings = {
+        async-backend = "epoll";
+        clipboard-paste-protection = false;
+        confirm-close-surface = false;
+        cursor-style = "block";
+        cursor-style-blink = false;
+        font-family = "Maple Mono NF";
+        font-size = 9;
+        font-style = "Regular";
+        gtk-toolbar-style = "flat";
+        mouse-scroll-multiplier = 0.95;
+        resize-overlay = "never";
+        shell-integration-features = "ssh-terminfo";
+        window-padding-x = 2;
+        window-padding-y = 2;
+        keybind = [
+          "shift+insert=paste_from_clipboard"
+          "control+insert=copy_to_clipboard"
+          "super+c=copy_to_clipboard"
+          "super+v=paste_from_clipboard"
+          "ctrl+k=reset"
+          "shift+enter=text:\\x1b\\r"
+        ];
+      };
+      themes.omarchy = {
+        background = "#1a1b26";
+        foreground = "#a9b1d6";
+        selection-background = "#2f3549";
+        selection-foreground = "#1a1b26";
+        palette = [
+          "0=#1a1b26"  "1=#c0caf5"  "2=#9ece6a"  "3=#0db9d7"
+          "4=#2ac3de"  "5=#bb9af7"  "6=#b4f9f8"  "7=#a9b1d6"
+          "8=#444b6a"  "9=#c0caf5"  "10=#9ece6a" "11=#0db9d7"
+          "12=#2ac3de" "13=#bb9af7" "14=#b4f9f8" "15=#d5d6db"
+          "16=#a9b1d6" "17=#f7768e" "18=#16161e" "19=#2f3549"
+          "20=#787c99" "21=#cbccd1"
+        ];
+      };
+    };
 		#thunderbird = {
 		#	enable = true;
 		#};
@@ -274,10 +375,20 @@ PROMPT_COMMAND=prompt_command
     jq.enable = true;
     gh = {
       enable = true;
-
+      gitCredentialHelper.enable = true;
       settings = {
         git_protocol = "ssh";
         prompt = "enabled";
+      };
+    };
+
+    rbw = {
+      enable = true;
+      package = unstable.rbw;
+      settings = {
+        email = "joey@ekstrom.org";
+        lock_timeout = 3600;
+        pinentry = pkgs.pinentry-qt;
       };
     };
 
@@ -288,10 +399,38 @@ PROMPT_COMMAND=prompt_command
     git = {
       enable = true;
       #delta.enable = true;
-      userName = "Joey Ekstrom";
-      userEmail = "joey@ekstech.net";
-      aliases = {
-        co = "checkout";
+      settings = {
+        user.name = "Joey Ekstrom";
+        user.email = "joey@ekstech.net";
+        alias.co = "checkout";
+      };
+    };
+
+    starship = {
+      enable = true;
+      settings = {
+        # Show relative path from home (~/…) or absolute path if outside home
+        directory = {
+          home_symbol = "~";
+          truncation_length = 3;
+          truncation_symbol = "…/";
+          format = "[$path]($style)[$read_only]($read_only_style) ";
+        };
+
+        # Disable git modules when in a jj repo; they still show elsewhere
+        git_branch.disabled = false;
+        git_status.disabled = false;
+
+        # Custom jujutsu module — shown instead of git when in a .jj repo
+        custom.jujutsu = {
+          description = "Jujutsu change id and bookmark";
+          # Shows shortest unique change ID, plus bookmark name if one exists
+          command = "jj log --no-graph --ignore-working-copy -r @ --template 'change_id.shortest() ++ if(bookmarks, \" \" ++ bookmarks.join(\", \"), \"\")' 2>/dev/null";
+          when = "test -d .jj";
+          style = "bold blue";
+          symbol = "jj ";
+          format = "on [$symbol$output]($style) ";
+        };
       };
     };
 
@@ -325,7 +464,7 @@ PROMPT_COMMAND=prompt_command
     zsh = {
       enable = true;
       enableVteIntegration = true;
-      dotDir = ".config/zsh";
+      dotDir = "${userinfo.homedir}/.config/zsh";
       envExtra = ''
       '';
       history = {
@@ -353,7 +492,7 @@ PROMPT_COMMAND=prompt_command
   };
 
   services = {
-    ssh-agent.enable = true;
+    ssh-agent.enable = false;  # replaced by rbw SSH agent
 		#gpg-agent = {
 		#  enable = false;
 		#  enableBashIntegration = true;

@@ -32,16 +32,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    omarchy-nix = {
-      url = "github:jcekstrom/omarchy-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    ghostty = {
-      url = "github:ghostty-org/ghostty";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     nixos-lima = {
       url = "github:nixos-lima/nixos-lima";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -84,6 +74,8 @@
       # NixOS configurations
       # ------------------------------------------------------------------ #
       nixosConfigurations = {
+        home-manager.useGlobalPkgs = true;
+        home-manager.useUserPackages = true;
 
         # Framework 13-inch 7040 AMD — primary Linux workstation
         ora = nixpkgs.lib.nixosSystem {
@@ -114,6 +106,9 @@
             { nixpkgs.config.allowUnfree = true; }
             ./hosts/lima-vm/default.nix
             {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+
               home-manager.extraSpecialArgs =
                 (hmSpecialArgs "x86_64-linux")
                 // {
@@ -183,7 +178,7 @@
         "jce" =
           let
             system = "x86_64-linux";
-            pkgs = import nixpkgs { inherit system; };
+            pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
             userinfo = {
               username = "jce";
               homedir = "/home/jce";
@@ -198,7 +193,7 @@
         "ssm-user" =
           let
             system = "x86_64-linux";
-            pkgs = import nixpkgs { inherit system; };
+            pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
             unstable = unstableFor system;
             userinfo = {
               username = "ssm-user";

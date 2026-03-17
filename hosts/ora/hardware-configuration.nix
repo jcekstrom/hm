@@ -29,6 +29,11 @@
       fsType = "xfs";
     };
 
+  fileSystems."/nix" = {
+    device = "/dev/vms/nix";
+    fsType = "ext4";
+  };
+
   swapDevices = [
     {
       device = "/dev/system/swap";

@@ -9,7 +9,6 @@
 
     ../../modules/nixos/common.nix
     ../../modules/nixos/desktops/plasma.nix
-    ../../modules/nixos/desktops/omarchy.nix
     ../../modules/nixos/nfs-autofs.nix
 
     inputs.home-manager.nixosModules.home-manager
@@ -18,6 +17,7 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
+    backupFileExtension = "bak";
     extraSpecialArgs = {
       inherit inputs;
       system = "x86_64-linux";
@@ -26,6 +26,8 @@
         homedir = "/home/jce";
       };
     };
-    users.jce = import ../../home;
+    users.jce = {
+      imports = [ (import ../../home) ];
+    };
   };
 }
