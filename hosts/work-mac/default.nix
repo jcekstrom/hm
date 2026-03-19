@@ -40,18 +40,4 @@
     curl
     git
   ];
-
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    extraSpecialArgs = {
-      inherit inputs;
-      system = "aarch64-darwin";
-      userinfo = {
-        username = "jekstr928@cable.comcast.com";
-        homedir = "/Users/jekstr928@cable.comcast.com";
-      };
-    };
-    users."jekstr928@cable.comcast.com" = import ../../home;
-  };
 }

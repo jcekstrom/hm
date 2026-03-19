@@ -16,7 +16,7 @@
     };
 
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/master";
+      url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -74,8 +74,6 @@
       # NixOS configurations
       # ------------------------------------------------------------------ #
       nixosConfigurations = {
-        home-manager.useGlobalPkgs = true;
-        home-manager.useUserPackages = true;
 
         # Framework 13-inch 7040 AMD — primary Linux workstation
         ora = nixpkgs.lib.nixosSystem {
@@ -85,15 +83,20 @@
             { nixpkgs.config.allowUnfree = true; }
             ./hosts/ora/default.nix
             {
-              # Pass unstable + nixvim-config into home-manager for the jce user
-              home-manager.extraSpecialArgs =
-                (hmSpecialArgs "x86_64-linux")
-                // {
-                  userinfo = {
-                    username = "jce";
-                    homedir = "/home/jce";
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                backupFileExtension = "bak";
+                extraSpecialArgs =
+                  (hmSpecialArgs "x86_64-linux")
+                  // {
+                    userinfo = {
+                      username = "jce";
+                      homedir = "/home/jce";
+                    };
                   };
-                };
+                users.jce = { imports = [ ./home ]; };
+              };
             }
           ];
         };
@@ -106,17 +109,19 @@
             { nixpkgs.config.allowUnfree = true; }
             ./hosts/lima-vm/default.nix
             {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-
-              home-manager.extraSpecialArgs =
-                (hmSpecialArgs "x86_64-linux")
-                // {
-                  userinfo = {
-                    username = "jce";
-                    homedir = "/home/jce";
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                extraSpecialArgs =
+                  (hmSpecialArgs "x86_64-linux")
+                  // {
+                    userinfo = {
+                      username = "jce";
+                      homedir = "/home/jce";
+                    };
                   };
-                };
+                users.jce = { imports = [ ./home ]; };
+              };
             }
           ];
         };
@@ -130,14 +135,19 @@
             { nixpkgs.config.allowUnfree = true; }
             ./hosts/lima-vm/default.nix
             {
-              home-manager.extraSpecialArgs =
-                (hmSpecialArgs "aarch64-linux")
-                // {
-                  userinfo = {
-                    username = "jce";
-                    homedir = "/home/jce";
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                extraSpecialArgs =
+                  (hmSpecialArgs "aarch64-linux")
+                  // {
+                    userinfo = {
+                      username = "jce";
+                      homedir = "/home/jce";
+                    };
                   };
-                };
+                users.jce = { imports = [ ./home ]; };
+              };
             }
           ];
         };
@@ -156,14 +166,19 @@
             { nixpkgs.config.allowUnfree = true; }
             ./hosts/work-mac/default.nix
             {
-              home-manager.extraSpecialArgs =
-                (hmSpecialArgs "aarch64-darwin")
-                // {
-                  userinfo = {
-                    username = "jekstr928@cable.comcast.com";
-                    homedir = "/Users/jekstr928@cable.comcast.com";
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                extraSpecialArgs =
+                  (hmSpecialArgs "aarch64-darwin")
+                  // {
+                    userinfo = {
+                      username = "jekstr928@cable.comcast.com";
+                      homedir = "/Users/jekstr928@cable.comcast.com";
+                    };
                   };
-                };
+                users."jekstr928@cable.comcast.com" = import ./home;
+              };
             }
           ];
         };

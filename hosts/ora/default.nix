@@ -14,20 +14,5 @@
     inputs.home-manager.nixosModules.home-manager
   ];
 
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    backupFileExtension = "bak";
-    extraSpecialArgs = {
-      inherit inputs;
-      system = "x86_64-linux";
-      userinfo = {
-        username = "jce";
-        homedir = "/home/jce";
-      };
-    };
-    users.jce = {
-      imports = [ (import ../../home) ];
-    };
-  };
+  # home-manager config is in flake.nix
 }

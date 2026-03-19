@@ -1,7 +1,5 @@
 { inputs, userinfo, pkgs, system, unstable, ... }:
 {
-  nixpkgs.config.allowUnfree = true;
-
   imports = [
 	  ./accounts.nix
     ./ssh.nix
@@ -387,7 +385,7 @@ PROMPT_COMMAND=prompt_command
       package = unstable.rbw;
       settings = {
         email = "joey@ekstrom.org";
-        lock_timeout = 3600;
+        lock_timeout = 28800;
         pinentry = pkgs.pinentry-qt;
       };
     };

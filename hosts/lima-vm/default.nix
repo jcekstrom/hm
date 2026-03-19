@@ -78,11 +78,7 @@
     wget
   ];
 
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    users.jce = import ../../home;
-  };
+  # home-manager config is in flake.nix
 
   system.stateVersion = "24.11";
 }
