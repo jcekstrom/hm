@@ -20,9 +20,11 @@ switch-hm:
 switch-ssm:
 	home-manager switch -b old --flake .#ssm-user
 
-# Lima VM: build x86_64 qcow2 image (run on ora)
+# Lima VM: build x86_64 qcow2 image (run on ora — not a flake output, invoked directly)
 build-lima-x86_64:
-	nix build .#packages.x86_64-linux.lima-vm-img \
+	nix run github:nix-community/nixos-generators -- \
+		--flake .#lima-vm \
+		--format qcow-efi \
 		--out-link result/nixos-x86_64.qcow2
 
 # Lima VM: build aarch64 qcow2 image (run on Mac — uses linux-builder)

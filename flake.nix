@@ -214,34 +214,34 @@
       # Build x86_64 on ora:   make build-lima-x86_64
       # Build aarch64 on Mac:  make build-lima-aarch64
       # ------------------------------------------------------------------ #
-      packages = let
-        limaVmModules = system: [
-          ./hosts/lima-vm/default.nix
-          {
-            home-manager.extraSpecialArgs =
-              (hmSpecialArgs system)
-              // {
-                userinfo = {
-                  username = "jce";
-                  homedir = "/home/jce";
+      # ------------------------------------------------------------------ #
+      # Package outputs — Lima VM qcow2 images
+      # Only aarch64 is exposed as a flake output (built on Mac via linux-builder).
+      # x86_64 is built on ora via: make build-lima-x86_64
+      # ------------------------------------------------------------------ #
+      packages =
+        let
+          limaVmModules = system: [
+            ./hosts/lima-vm/default.nix
+            {
+              home-manager.extraSpecialArgs =
+                (hmSpecialArgs system)
+                // {
+                  userinfo = {
+                    username = "jce";
+                    homedir = "/home/jce";
+                  };
                 };
-              };
-          }
-        ];
-      in {
-        x86_64-linux.lima-vm-img = nixos-generators.nixosGenerate {
-          pkgs = import nixpkgs { system = "x86_64-linux"; config.allowUnfree = true; };
-          specialArgs = { inherit inputs; };
-          modules = limaVmModules "x86_64-linux";
-          format = "qcow-efi";
+            }
+          ];
+        in
+        {
+          aarch64-linux.lima-vm-img = nixos-generators.nixosGenerate {
+            pkgs = import nixpkgs { system = "aarch64-linux"; config.allowUnfree = true; };
+            specialArgs = { inherit inputs; };
+            modules = limaVmModules "aarch64-linux";
+            format = "qcow-efi";
+          };
         };
-
-        aarch64-linux.lima-vm-img = nixos-generators.nixosGenerate {
-          pkgs = import nixpkgs { system = "aarch64-linux"; config.allowUnfree = true; };
-          specialArgs = { inherit inputs; };
-          modules = limaVmModules "aarch64-linux";
-          format = "qcow-efi";
-        };
-      };
     };
 }
